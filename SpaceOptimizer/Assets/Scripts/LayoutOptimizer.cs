@@ -39,7 +39,7 @@ public class LayoutOptimizer :  MonoBehaviour
     {
         ConnectionModule connectionModule = new ConnectionModule(position, _ConnectionModules);
         _ConnectionModules.Add(connectionModule);
-        FieldTiles[position.x, position.y].Free = false;
+        FieldTiles[position.x, position.y].TileType = FieldTile.eTileType.Connection;
 
         return connectionModule;
     }
@@ -50,25 +50,29 @@ public class LayoutOptimizer :  MonoBehaviour
 
         for (int x = position.x; x < position.x + buildModule.Size.x; x++)
             for (int y = position.y; y < position.y + buildModule.Size.y; y++)
-                FieldTiles[x, y].Free = false;
+                FieldTiles[x, y].TileType = FieldTile.eTileType.Module;
 
         buildModule.AmountPlaced++;
         _Modules.Add(module);
 
         if (buildModule.ConnectionNeeded)
         {
-            ConnectionModule connection = module.GetConnection(_ConnectionModules);
-            if (connection == null || !connection.IsConnectedToMainModule(_Modules[0].Bounds, new List<ConnectionModule>()))
+            ConnectionModule connection = _Modules[0].GetBestConnection(module, _ConnectionModules, FieldTiles);
+            if (connection == null || !connection.IsConnectedToModule(module, new List<ConnectionModule>()))
             {
-                ConnectionModule cm = CreateConnectionModuleAtPosition(module.GetClosestFreeTile(FieldTiles, _ConnectionModules).Position);
-                if (!cm.IsConnectedToMainModule(_Modules[0].Bounds, new List<ConnectionModule>()))
+                // ConnectionModule cm = CreateConnectionModuleAtPosition(module.GetClosestFreeTile(FieldTiles, _ConnectionModules).Position);
+                FieldTile tile = _Modules[0].GetClosestTileToModule(_Modules[0].GetAdjacentTilesOfType(FieldTiles, FieldTile.eTileType.Empty, FieldTile.eTileType.Connection), module);
+                Debug.Log(tile);
+                ConnectionModule cm = CreateConnectionModuleAtPosition(tile.Position);
+
+                if (!cm.IsConnectedToModule(module, new List<ConnectionModule>()))
                 {
                     while (true)
                     {
-                        FieldTile newTile = cm.GetClosestFreeTile(FieldTiles, _ConnectionModules);
-                            cm = CreateConnectionModuleAtPosition(newTile.Position);
+                        FieldTile newTile = cm.GetClosestTileToModule(_Modules[0].GetAdjacentTilesOfType(FieldTiles, FieldTile.eTileType.Empty, FieldTile.eTileType.Connection), module);
+                        cm = CreateConnectionModuleAtPosition(newTile.Position);
 
-                        if (cm.IsConnectedToMainModule(_Modules[0].Bounds, new List<ConnectionModule>()))
+                        if (cm.IsConnectedToModule(module, new List<ConnectionModule>()))
                         {
                             break;
                         }

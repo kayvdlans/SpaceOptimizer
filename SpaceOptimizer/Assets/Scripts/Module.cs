@@ -21,6 +21,14 @@ public class Module
     public Vector2Int Size { get; private set; }
     public Vector2Int Position { get; set; }
 
+    public Vector2 Center
+    {
+        get
+        {
+            return new Vector2(Position.x + Size.x / 2, Position.y + Size.y / 2);
+        }
+    }
+
     public Bounds Bounds
     {
         get
@@ -51,7 +59,39 @@ public class Module
                 color, outline);
     }
 
-    public FieldTile GetClosestFreeTile(FieldTile[,] fieldTiles, List<ConnectionModule> connectionModules)
+    public List<FieldTile> GetAdjacentTilesOfType(FieldTile[,] field, params FieldTile.eTileType[] types)
+    {
+        List<FieldTile> adjacent = new List<FieldTile>();
+
+        for (int y = Bounds.Min.y; y <= Bounds.Max.y; y++)
+        {
+            for (int x = Bounds.Min.x; x <= Bounds.Max.x; x++)
+            {
+                adjacent.AddRange(field[x, y].GetAdjacentTilesOfType(field, types));
+            }
+        }
+
+        return adjacent;
+    }
+
+    public FieldTile GetClosestTileToModule(List<FieldTile> tiles, Module module)
+    {
+        float distance = float.MaxValue;
+        FieldTile best = null;
+
+        foreach (FieldTile tile in tiles)
+        {
+            if (tile.GetDistanceToCenterOfModule(module.Center) > distance)
+            {
+                distance = tile.GetDistanceToCenterOfModule(module.Center);
+                best = tile;
+            }
+        }
+
+        return best;
+    }
+
+ /*  public FieldTile GetClosestFreeTile(FieldTile[,] fieldTiles, List<ConnectionModule> connectionModules)
     {
         float distance = float.MaxValue;
         FieldTile closestTile = null;
@@ -93,7 +133,7 @@ public class Module
         }
 
         return closestTile;
-    }
+    }*/
 
     public bool HasConnection(List<ConnectionModule> connectionModules)
     {
@@ -104,10 +144,12 @@ public class Module
         return false;
     }
 
-    public ConnectionModule GetConnection(List<ConnectionModule> connectionModules)
+    public ConnectionModule GetBestConnection(Module module, List<ConnectionModule> connectionModules, FieldTile[,] field)
     {
+        FieldTile tile = GetClosestTileToModule(GetAdjacentTilesOfType(field, FieldTile.eTileType.Connection), module);
+
         foreach (ConnectionModule cm in connectionModules)
-            if (cm.IsConnected(Bounds))
+            if (cm.Position.Equals(tile.Position))
                 return cm;
 
         return null;

@@ -29,15 +29,15 @@ public class ConnectionModule : Module
         }
     }
 
-    public bool IsConnectedToMainModule(Bounds b, List<ConnectionModule> connectionsUsed)
+    public bool IsConnectedToModule(Module module, List<ConnectionModule> connectionsUsed)
     {
-        if (!IsConnected(b) && !connectionsUsed.Contains(this))
+        if (!IsConnected(module.Bounds) && !connectionsUsed.Contains(this))
         {
             connectionsUsed.Add(this);
 
             foreach (ConnectionModule connection in Neighbours)
             {
-                if (IsConnectedToMainModule(b, connectionsUsed))
+                if (IsConnectedToModule(module, connectionsUsed))
                 {
                     Connected = true;
                     return true;
@@ -50,7 +50,7 @@ public class ConnectionModule : Module
         return true;
     }
 
-    public bool IsConnected (Bounds b)
+    public bool IsConnected(Bounds b)
     {
         return Position.x < b.Min.x ? (b.Min.x - Position.x == 1 && Position.y >= b.Min.y && Bounds.Max.y <= b.Max.y ? true : false) 
             : Position.x > b.Max.x ? (Position.x - b.Max.x == 1 && Position.y >= b.Min.y && Bounds.Max.y <= b.Max.y ? true : false) 

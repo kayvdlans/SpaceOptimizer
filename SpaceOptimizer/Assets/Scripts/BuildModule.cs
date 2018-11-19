@@ -27,7 +27,7 @@ public class BuildModule
         {
             for (int y = position.y; y < position.y + Size.y; y++)
             {
-                if (!fieldTiles[x, y].Free)
+                if (fieldTiles[x, y].TileType != FieldTile.eTileType.Empty)
                 {
                     return true;
                 }
