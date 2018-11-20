@@ -54,8 +54,7 @@ public class LayoutOptimizer :  MonoBehaviour
 
         buildModule.AmountPlaced++;
         _Modules.Add(module);
-
-        //REALLY NEEDS A FIX!
+        
         if (buildModule.ConnectionNeeded)
         {
             foreach (FieldTile tile in _Modules[0].GetSortedListByDistanceToModule(_Modules[0].GetAdjacentTilesOfType(FieldTiles, FieldTile.eTileType.Connection, FieldTile.eTileType.Empty), module))
@@ -67,8 +66,7 @@ public class LayoutOptimizer :  MonoBehaviour
         
         return module;
     }
-
-    //this shit crashes unity :)
+    
     private bool TryCreateConnectionToModule(Module module, FieldTile tile, List<FieldTile> unavailable)
     {
         if (unavailable.Contains(tile))
