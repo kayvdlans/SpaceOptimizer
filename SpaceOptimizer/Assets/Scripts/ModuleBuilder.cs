@@ -1,16 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class ModuleBuilder : MonoBehaviour
+namespace SpaceOptimizer.Modules
 {
-    [SerializeField]
-    private List<BuildModule> _BuildModules = new List<BuildModule>();
-    public List<BuildModule> BuildModules
+    public class ModuleBuilder : MonoBehaviour
     {
-        get
+        [SerializeField]
+        private List<BuildModule> _BuildModules = new List<BuildModule>();
+        public List<BuildModule> BuildModules
         {
-            return _BuildModules;
+            get
+            {
+                return _BuildModules;
+            }
         }
     }
 }

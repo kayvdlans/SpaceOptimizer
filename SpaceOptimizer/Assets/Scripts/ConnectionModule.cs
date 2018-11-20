@@ -1,60 +1,73 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class ConnectionModule : Module
+namespace SpaceOptimizer.Modules
 {
-    public List<ConnectionModule> Neighbours { get; private set; }
-    public bool Connected { get; private set; }
-
-    public ConnectionModule(Vector2Int position, List<ConnectionModule> connectionModules) : base("Connection", Vector2Int.one, position)
+    public class ConnectionModule : Module
     {
-        Connected = false;
-        FindNeighbours(connectionModules);
-    }
-    
-    private void FindNeighbours(List<ConnectionModule> connectionModules)
-    {
-        Neighbours = new List<ConnectionModule>();
+        public List<ConnectionModule> Neighbours { get; private set; }
+        public bool Connected { get; private set; }
 
-        foreach (ConnectionModule cm in connectionModules)
+        public ConnectionModule(Vector2Int position, List<ConnectionModule> connectionModules)
+            : base("Connection", Vector2Int.one, position)
         {
-            if (cm != this)
+            Connected = false;
+            FindNeighbours(connectionModules);
+        }
+
+        private void FindNeighbours(List<ConnectionModule> connectionModules)
+        {
+            Neighbours = new List<ConnectionModule>();
+
+            foreach (ConnectionModule cm in connectionModules)
             {
-                if (Vector2Int.Distance(Position, cm.Position) == 1)
+                if (cm != this)
                 {
-                    Neighbours.Add(cm);
-                    cm.Neighbours.Add(this);
+                    if (Vector2Int.Distance(Position, cm.Position) == 1)
+                    {
+                        Neighbours.Add(cm);
+                        cm.Neighbours.Add(this);
+                    }
                 }
             }
         }
-    }
 
-    public bool IsConnectedToModule(Module module, List<ConnectionModule> connectionsUsed)
-    {
-        if (!IsConnected(module.Bounds) && !connectionsUsed.Contains(this))
+        public bool IsConnectedToModule(Module module, List<ConnectionModule> connectionsUsed)
         {
-            connectionsUsed.Add(this);
-
-            foreach (ConnectionModule connection in Neighbours)
+            if (!IsConnected(module.Bounds) && !connectionsUsed.Contains(this))
             {
-                if (IsConnectedToModule(module, connectionsUsed))
+                connectionsUsed.Add(this);
+
+                foreach (ConnectionModule connection in Neighbours)
                 {
-                    Connected = true;
-                    return true;
+                    if (IsConnectedToModule(module, connectionsUsed))
+                    {
+                        Connected = true;
+                        return true;
+                    }
                 }
+
+                return false;
             }
 
-            return false;
+            return true;
         }
-        
-        return true;
-    }
 
-    public bool IsConnected(Bounds b)
-    {
-        return Position.x < b.Min.x ? (b.Min.x - Position.x == 1 && Position.y >= b.Min.y && Bounds.Max.y <= b.Max.y ? true : false)
-            : Position.x > b.Max.x ? (Position.x - b.Max.x == 1 && Position.y >= b.Min.y && Bounds.Max.y <= b.Max.y ? true : false)
-            : Position.y < b.Min.y ? (b.Min.y - Position.y == 1 && Position.x >= b.Min.x && Bounds.Max.x <= b.Max.x ? true : false)
-            : Position.y - b.Max.y == 1 && Position.x >= b.Min.x && Bounds.Max.x <= b.Max.x ? true : false;
+        public bool IsConnected(Bounds b)
+        {
+            //??
+            return Position.x < b.Min.x ? (b.Min.x - Position.x == 1
+                && Position.y >= b.Min.y
+                && Bounds.Max.y <= b.Max.y)
+                : Position.x > b.Max.x ? (Position.x - b.Max.x == 1
+                && Position.y >= b.Min.y
+                && Bounds.Max.y <= b.Max.y)
+                : Position.y < b.Min.y ? (b.Min.y - Position.y == 1
+                && Position.x >= b.Min.x
+                && Bounds.Max.x <= b.Max.x)
+                : Position.y - b.Max.y == 1
+                && Position.x >= b.Min.x
+                && Bounds.Max.x <= b.Max.x;
+        }
     }
 }
