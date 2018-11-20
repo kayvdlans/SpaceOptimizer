@@ -132,8 +132,5 @@ public class LayoutOptimizer :  MonoBehaviour
                 TryCreateNewModule(new Vector2Int(x, y));
             }
         }
-
-        if (_Modules.Count >= 52)   
-            _Modules[51].Draw(Color.blue, Color.cyan);
     }
 }
