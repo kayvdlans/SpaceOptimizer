@@ -22,8 +22,9 @@ public class LayoutDrawer : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        foreach (FieldTile tile in _LayoutOptimizer.FieldTiles)
-            tile.Draw();
+        if (_LayoutOptimizer.FieldTiles != null)
+            foreach (FieldTile tile in _LayoutOptimizer.FieldTiles)
+                tile.Draw();
 
         DrawField();
 

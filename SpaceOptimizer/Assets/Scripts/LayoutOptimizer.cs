@@ -62,8 +62,6 @@ public class LayoutOptimizer :  MonoBehaviour
             {
                 if (TryCreateConnectionToModule(module, tile, new List<FieldTile>()))
                     break;
-
-                Debug.Log("Failed creating connection from tile: " + tile.Position);
             }
         }
         
@@ -76,10 +74,7 @@ public class LayoutOptimizer :  MonoBehaviour
         if (unavailable.Contains(tile))
             return false;
         else
-            unavailable.Add(tile);
-
-        if (tile.Equals(FieldTiles[2, 7]))
-            Debug.Log("What");
+            unavailable.Add(tile);  
 
         ConnectionModule connection = tile.TileType == FieldTile.eTileType.Connection ? tile.GetConnectionModule(_ConnectionModules) : CreateConnectionModuleAtPosition(tile.Position); 
 
@@ -94,9 +89,10 @@ public class LayoutOptimizer :  MonoBehaviour
                 List<FieldTile> tiles = tile.GetAdjacentTilesOfType(FieldTiles, FieldTile.eTileType.Empty, FieldTile.eTileType.Connection);
 
                 tiles.Sort((x, y) => x.GetDistanceToCenterOfModule(module.Center).CompareTo(y.GetDistanceToCenterOfModule(module.Center)));
-
+                
                 foreach (FieldTile t in tiles)
-                    return TryCreateConnectionToModule(module, t, unavailable);
+                    if (TryCreateConnectionToModule(module, t, unavailable))
+                        return true;
             }
         }
 
