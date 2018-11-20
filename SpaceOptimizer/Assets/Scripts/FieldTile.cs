@@ -49,6 +49,15 @@ public class FieldTile
         return Vector2.Distance(Position, center);
     }
 
+    public ConnectionModule GetModule(List<ConnectionModule> modules)
+    {
+        foreach (ConnectionModule m in modules)
+            if (m.Position.Equals(Position))
+                return m;
+
+        return null;
+    }
+
     public void Draw()
     {
         Handles.DrawSolidRectangleWithOutline(

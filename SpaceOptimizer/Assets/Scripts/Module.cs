@@ -81,7 +81,7 @@ public class Module
 
         foreach (FieldTile tile in tiles)
         {
-            if (tile.GetDistanceToCenterOfModule(module.Center) > distance)
+            if (tile.GetDistanceToCenterOfModule(module.Center) < distance)
             {
                 distance = tile.GetDistanceToCenterOfModule(module.Center);
                 best = tile;
@@ -90,50 +90,6 @@ public class Module
 
         return best;
     }
-
- /*  public FieldTile GetClosestFreeTile(FieldTile[,] fieldTiles, List<ConnectionModule> connectionModules)
-    {
-        float distance = float.MaxValue;
-        FieldTile closestTile = null;
-
-        for (int y = Bounds.Min.y - 1; y <= Bounds.Max.y + 1; y++)
-        {
-            if (y < 0 || y >= fieldTiles.GetLength(1))
-                continue;
-
-            for (int x = Bounds.Min.x - 1; x <= Bounds.Max.x + 1; x++)
-            {
-                if (x < 0 || x >= fieldTiles.GetLength(0))
-                    continue;
-
-                if (!fieldTiles[x, y].Free)
-                    continue;
-
-                if (x == Bounds.Min.x - 1 && y == Bounds.Min.y - 1 || 
-                    x == Bounds.Max.x + 1 && y == Bounds.Max.y + 1 ||
-                    x == Bounds.Min.x - 1 && y == Bounds.Max.y + 1 ||
-                    x == Bounds.Max.x + 1 && y == Bounds.Min.y - 1)
-                    continue;
-
-
-                float distanceToClosestConnection = float.MaxValue;
-                foreach (ConnectionModule connection in connectionModules)
-                {
-                    float distanceToConnection = Vector2Int.Distance(connection.Position, fieldTiles[x, y].Position);
-                    if (distanceToConnection < distanceToClosestConnection)
-                        distanceToClosestConnection = distanceToConnection;
-                }
-
-                if (connectionModules.Count != 0 ? distanceToClosestConnection < distance : fieldTiles[x, y].DistanceToMainModule < distance)
-                {
-                    distance = connectionModules.Count != 0 ? distanceToClosestConnection : fieldTiles[x, y].DistanceToMainModule;
-                    closestTile = fieldTiles[x, y];
-                }
-            }
-        }
-
-        return closestTile;
-    }*/
 
     public bool HasConnection(List<ConnectionModule> connectionModules)
     {

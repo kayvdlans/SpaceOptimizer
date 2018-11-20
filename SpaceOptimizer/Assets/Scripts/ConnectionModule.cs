@@ -52,8 +52,8 @@ public class ConnectionModule : Module
 
     public bool IsConnected(Bounds b)
     {
-        return Position.x < b.Min.x ? (b.Min.x - Position.x == 1 && Position.y >= b.Min.y && Bounds.Max.y <= b.Max.y ? true : false) 
-            : Position.x > b.Max.x ? (Position.x - b.Max.x == 1 && Position.y >= b.Min.y && Bounds.Max.y <= b.Max.y ? true : false) 
+        return Position.x < b.Min.x ? (b.Min.x - Position.x == 1 && Position.y >= b.Min.y && Bounds.Max.y <= b.Max.y ? true : false)
+            : Position.x > b.Max.x ? (Position.x - b.Max.x == 1 && Position.y >= b.Min.y && Bounds.Max.y <= b.Max.y ? true : false)
             : Position.y < b.Min.y ? (b.Min.y - Position.y == 1 && Position.x >= b.Min.x && Bounds.Max.x <= b.Max.x ? true : false)
             : Position.y - b.Max.y == 1 && Position.x >= b.Min.x && Bounds.Max.x <= b.Max.x ? true : false;
     }

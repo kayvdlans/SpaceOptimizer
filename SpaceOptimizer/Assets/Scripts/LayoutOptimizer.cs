@@ -55,32 +55,43 @@ public class LayoutOptimizer :  MonoBehaviour
         buildModule.AmountPlaced++;
         _Modules.Add(module);
 
+        //REALLY needs optimization
         if (buildModule.ConnectionNeeded)
         {
             ConnectionModule connection = _Modules[0].GetBestConnection(module, _ConnectionModules, FieldTiles);
-            if (connection == null || !connection.IsConnectedToModule(module, new List<ConnectionModule>()))
+            if (connection == null || !connection.IsConnected(module.Bounds))
             {
-                // ConnectionModule cm = CreateConnectionModuleAtPosition(module.GetClosestFreeTile(FieldTiles, _ConnectionModules).Position);
                 FieldTile tile = _Modules[0].GetClosestTileToModule(_Modules[0].GetAdjacentTilesOfType(FieldTiles, FieldTile.eTileType.Empty, FieldTile.eTileType.Connection), module);
-                Debug.Log(tile);
-                ConnectionModule cm = CreateConnectionModuleAtPosition(tile.Position);
 
-                if (!cm.IsConnectedToModule(module, new List<ConnectionModule>()))
+                ConnectionModule cm = null;
+
+                if (tile.TileType.Equals(FieldTile.eTileType.Empty))
+                    cm = CreateConnectionModuleAtPosition(tile.Position);
+                else
+                    cm = tile.GetModule(_ConnectionModules);
+
+                if (!cm.IsConnected(module.Bounds))
                 {
-                    while (true)
+                    int tries = 0;
+                    while (tries < 5)
                     {
-                        FieldTile newTile = cm.GetClosestTileToModule(_Modules[0].GetAdjacentTilesOfType(FieldTiles, FieldTile.eTileType.Empty, FieldTile.eTileType.Connection), module);
-                        cm = CreateConnectionModuleAtPosition(newTile.Position);
+                        FieldTile newTile = cm.GetClosestTileToModule(cm.GetAdjacentTilesOfType(FieldTiles, FieldTile.eTileType.Empty, FieldTile.eTileType.Connection), module);
 
-                        if (cm.IsConnectedToModule(module, new List<ConnectionModule>()))
-                        {
+                        if (newTile.TileType.Equals(FieldTile.eTileType.Empty))
+                            cm = CreateConnectionModuleAtPosition(newTile.Position);
+                        else
+                            cm = newTile.GetModule(_ConnectionModules) as ConnectionModule;
+
+                        tries++;
+
+                        if (cm.IsConnected(module.Bounds))
                             break;
-                        }
+
                     }
                 }
             }
         }
-
+        
         return module;
     }
 
