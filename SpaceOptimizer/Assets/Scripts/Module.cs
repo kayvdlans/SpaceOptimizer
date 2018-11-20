@@ -74,16 +74,22 @@ public class Module
         return adjacent;
     }
 
-    public FieldTile GetClosestTileToModule(List<FieldTile> tiles, Module module)
+    public List<FieldTile> GetSortedListByDistanceToModule(List<FieldTile> tiles, Module module)
+    {
+        tiles.Sort((x, y) => x.GetDistanceToCenterOfModule(module.Center).CompareTo(y.GetDistanceToCenterOfModule(module.Center)));
+        return tiles;
+    }
+
+    public FieldTile GetClosestTileToModule(List<FieldTile> tiles)
     {
         float distance = float.MaxValue;
         FieldTile best = null;
 
         foreach (FieldTile tile in tiles)
         {
-            if (tile.GetDistanceToCenterOfModule(module.Center) < distance)
+            if (tile.GetDistanceToCenterOfModule(Center) < distance)
             {
-                distance = tile.GetDistanceToCenterOfModule(module.Center);
+                distance = tile.GetDistanceToCenterOfModule(Center);
                 best = tile;
             }
         }
@@ -102,7 +108,7 @@ public class Module
 
     public ConnectionModule GetBestConnection(Module module, List<ConnectionModule> connectionModules, FieldTile[,] field)
     {
-        FieldTile tile = GetClosestTileToModule(GetAdjacentTilesOfType(field, FieldTile.eTileType.Connection), module);
+        FieldTile tile = GetClosestTileToModule(GetAdjacentTilesOfType(field, FieldTile.eTileType.Connection));
 
         foreach (ConnectionModule cm in connectionModules)
             if (cm.Position.Equals(tile.Position))

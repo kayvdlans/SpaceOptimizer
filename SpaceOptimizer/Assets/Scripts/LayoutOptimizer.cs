@@ -55,44 +55,52 @@ public class LayoutOptimizer :  MonoBehaviour
         buildModule.AmountPlaced++;
         _Modules.Add(module);
 
-        //REALLY needs optimization
+        //REALLY NEEDS A FIX!
         if (buildModule.ConnectionNeeded)
         {
-            ConnectionModule connection = _Modules[0].GetBestConnection(module, _ConnectionModules, FieldTiles);
-            if (connection == null || !connection.IsConnected(module.Bounds))
+            foreach (FieldTile tile in _Modules[0].GetSortedListByDistanceToModule(_Modules[0].GetAdjacentTilesOfType(FieldTiles, FieldTile.eTileType.Connection, FieldTile.eTileType.Empty), module))
             {
-                FieldTile tile = _Modules[0].GetClosestTileToModule(_Modules[0].GetAdjacentTilesOfType(FieldTiles, FieldTile.eTileType.Empty, FieldTile.eTileType.Connection), module);
+                if (TryCreateConnectionToModule(module, tile, new List<FieldTile>()))
+                    break;
 
-                ConnectionModule cm = null;
-
-                if (tile.TileType.Equals(FieldTile.eTileType.Empty))
-                    cm = CreateConnectionModuleAtPosition(tile.Position);
-                else
-                    cm = tile.GetModule(_ConnectionModules);
-
-                if (!cm.IsConnected(module.Bounds))
-                {
-                    int tries = 0;
-                    while (tries < 5)
-                    {
-                        FieldTile newTile = cm.GetClosestTileToModule(cm.GetAdjacentTilesOfType(FieldTiles, FieldTile.eTileType.Empty, FieldTile.eTileType.Connection), module);
-
-                        if (newTile.TileType.Equals(FieldTile.eTileType.Empty))
-                            cm = CreateConnectionModuleAtPosition(newTile.Position);
-                        else
-                            cm = newTile.GetModule(_ConnectionModules) as ConnectionModule;
-
-                        tries++;
-
-                        if (cm.IsConnected(module.Bounds))
-                            break;
-
-                    }
-                }
+                Debug.Log("Failed creating connection from tile: " + tile.Position);
             }
         }
         
         return module;
+    }
+
+    //this shit crashes unity :)
+    private bool TryCreateConnectionToModule(Module module, FieldTile tile, List<FieldTile> unavailable)
+    {
+        if (unavailable.Contains(tile))
+            return false;
+        else
+            unavailable.Add(tile);
+
+        if (tile.Equals(FieldTiles[2, 7]))
+            Debug.Log("What");
+
+        ConnectionModule connection = tile.TileType == FieldTile.eTileType.Connection ? tile.GetConnectionModule(_ConnectionModules) : CreateConnectionModuleAtPosition(tile.Position); 
+
+        if (connection != null)
+        {
+            if (connection.IsConnected(module.Bounds))
+            {
+                return true;
+            }
+            else
+            {
+                List<FieldTile> tiles = tile.GetAdjacentTilesOfType(FieldTiles, FieldTile.eTileType.Empty, FieldTile.eTileType.Connection);
+
+                tiles.Sort((x, y) => x.GetDistanceToCenterOfModule(module.Center).CompareTo(y.GetDistanceToCenterOfModule(module.Center)));
+
+                foreach (FieldTile t in tiles)
+                    return TryCreateConnectionToModule(module, t, unavailable);
+            }
+        }
+
+        return false;
     }
 
     private void TryCreateNewModule(Vector2Int position)
@@ -128,5 +136,8 @@ public class LayoutOptimizer :  MonoBehaviour
                 TryCreateNewModule(new Vector2Int(x, y));
             }
         }
+
+        if (_Modules.Count >= 52)   
+            _Modules[51].Draw(Color.blue, Color.cyan);
     }
 }

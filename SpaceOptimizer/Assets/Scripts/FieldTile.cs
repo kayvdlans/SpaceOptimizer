@@ -25,7 +25,7 @@ public class FieldTile
     public List<FieldTile> GetAdjacentTilesOfType(FieldTile[,] field, params eTileType[] types)
     {
         List<FieldTile> adjacent = new List<FieldTile>();
-
+        
         foreach (eTileType t in types)
         {
             if (Position.x - 1 >= 0 && field[Position.x - 1, Position.y].TileType == t)
@@ -37,7 +37,7 @@ public class FieldTile
             if (Position.y - 1 >= 0 && field[Position.x, Position.y - 1].TileType == t)
                 adjacent.Add(field[Position.x, Position.y - 1]);
 
-            if (Position.y < field.GetLength(1) && field[Position.x, Position.y + 1].TileType == t)
+            if (Position.y + 1 < field.GetLength(1) && field[Position.x, Position.y + 1].TileType == t)
                 adjacent.Add(field[Position.x, Position.y + 1]);
         }
 
@@ -49,7 +49,7 @@ public class FieldTile
         return Vector2.Distance(Position, center);
     }
 
-    public ConnectionModule GetModule(List<ConnectionModule> modules)
+    public ConnectionModule GetConnectionModule(List<ConnectionModule> modules)
     {
         foreach (ConnectionModule m in modules)
             if (m.Position.Equals(Position))
